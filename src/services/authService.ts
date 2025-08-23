@@ -1,13 +1,24 @@
+import ms from "ms";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 import { validateCreateUser, validateLoginUser, type CreateUserInput, type IUser, type LoginUserInput } from "#models/user.js";
-import { createUser, findByEmail } from "#repositories/userRepository.js";
+import { createUser, findByEmail, findById } from "#repositories/userRepository.js";
+import logger from "#utils/logger.js";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
+const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET as string;
+
 if (!JWT_SECRET) {
   throw new Error("JWT_SECRET environment variable is not set");
 }
+
+if (!REFRESH_TOKEN_SECRET) {
+  throw new Error("REFRESH_TOKEN_SECRET environment variable is not set");
+}
+
+const ACCESS_TOKEN_EXPIRES = (process.env.ACCESS_TOKEN_EXPIRES_IN || "1h") as ms.StringValue;
+const REFRESH_TOKEN_EXPIRES = (process.env.REFRESH_TOKEN_EXPIRES_IN || "7d") as ms.StringValue;
 
 export const registerUser = async (data: unknown): Promise<IUser> => {
   const validatedUser: CreateUserInput = validateCreateUser(data);
@@ -25,7 +36,7 @@ export const registerUser = async (data: unknown): Promise<IUser> => {
   return newUser;
 };
 
-export const loginUser = async (data: unknown): Promise<{ user: IUser; token: string }> => {
+export const loginUser = async (data: unknown): Promise<{ user: IUser; accessToken: string; refreshToken: string }> => {
   const { email, password }: LoginUserInput = validateLoginUser(data);
 
   // Find user
@@ -45,10 +56,33 @@ export const loginUser = async (data: unknown): Promise<{ user: IUser; token: st
     throw new Error("Invalid password for the email");
   }
 
-  // Generate JWT
-  const token = jwt.sign({ _id: (user._id as string | number | { toString(): string }).toString(), role: user.role }, JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  const payload = { _id: (user._id as { toString(): string }).toString(), role: user.role };
 
-  return { user, token };
+  const accessToken = jwt.sign(payload, JWT_SECRET, { expiresIn: ms(ACCESS_TOKEN_EXPIRES) });
+  const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, { expiresIn: ms(REFRESH_TOKEN_EXPIRES) });
+
+  return { user, accessToken, refreshToken };
+};
+
+export const refreshToken = (token: string): { accessToken: string } => {
+  try {
+    const payload = jwt.verify(token, REFRESH_TOKEN_SECRET) as { _id: string; role: string };
+
+    const accessToken = jwt.sign({ _id: payload._id, role: payload.role }, JWT_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES });
+
+    return { accessToken };
+  } catch (error) {
+    logger.error("Refresh token error:", error);
+    throw new Error("Invalid refresh token");
+  }
+};
+
+export const getUserById = async (id: string): Promise<IUser> => {
+  const user = await findById(id);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
 };

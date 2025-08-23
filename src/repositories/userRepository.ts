@@ -9,3 +9,7 @@ export const createUser = async (data: CreateUserInput): Promise<IUser> => {
 
   return user.save();
 };
+
+export const findById = async (id: string): Promise<IUser | null> => {
+  return User.findById(id).exec();
+};

@@ -3,6 +3,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import express from "express";
 import compression from "compression";
+import cookieParser from "cookie-parser";
 
 import logger from "#utils/logger.js";
 import mainRoutes from "./routes/index.js";
@@ -23,6 +24,7 @@ app.use(helmet());
 app.use(cors());
 app.use(compression());
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
 // Using Morgan with custom Winston stream

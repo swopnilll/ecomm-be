@@ -1,6 +1,7 @@
 import { Router } from "express";
 
-import { loginUser, registerUser } from "#controllers/authController.js";
+import { authenticateToken } from "#middleware/authMiddleware.js";
+import { getCurrentUser, loginUser, logoutUser, refreshAccessToken, registerUser } from "#controllers/authController.js";
 
 const router = Router();
 
@@ -11,5 +12,11 @@ router.get("/", (req, res) => {
 // Register route
 router.post("/register", registerUser);
 router.post("/login", loginUser);
+router.post("/logout", logoutUser);
+
+router.post("/refresh", refreshAccessToken);
+
+// Protected route
+router.get("/me", authenticateToken, getCurrentUser);
 
 export default router;
