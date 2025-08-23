@@ -86,3 +86,27 @@ export const getUserById = async (id: string): Promise<IUser> => {
 
   return user;
 };
+
+export const changePassword = async (userId: string, currentPassword?: string, newPassword?: string): Promise<void> => {
+  if (!currentPassword || !newPassword) {
+    throw new Error("Current password and new password are required.");
+  }
+
+  const user = await findById(userId);
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  // Verify current password
+  const isMatch = await bcrypt.compare(currentPassword, user.password);
+  if (!isMatch) {
+    throw new Error("Incorrect current password.");
+  }
+
+  // Hash new password
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  // Update user's password
+  user.password = hashedPassword;
+  await user.save();
+};

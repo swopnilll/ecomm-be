@@ -130,3 +130,21 @@ export const getCurrentUser = async (req: Request, res: Response) => {
     res.status(404).json({ error: "User not found" });
   }
 };
+
+export const changePassword = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user || !req.user._id) {
+      res.status(401).json({ error: "Authentication required to change password." });
+      return;
+    }
+
+    const { currentPassword, newPassword } = req.body;
+    await authService.changePassword(req.user._id, currentPassword, newPassword);
+
+    logger.info(`Password successfully changed for user ID: ${req.user._id}`);
+    res.status(200).json({ message: "Password has been successfully changed." });
+  } catch (error) {
+    logger.error(`Password change failed for user ID: ${req.user?._id}. Error: ${(error as Error).message}`);
+    res.status(400).json({ error: (error as Error).message });
+  }
+};
