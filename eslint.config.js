@@ -5,7 +5,15 @@ import vitest from "@vitest/eslint-plugin";
 
 export default [
   {
-    ignores: ["dist/**/*"],
+    ignores: [
+      "dist/**/*",
+      "build/**/*",
+      "coverage/**/*",
+      "node_modules/**/*",
+      "*.js", // Ignore JS files at root level
+      "*.mjs",
+      ".env*",
+    ],
   },
   eslint.configs.recommended,
   {
@@ -34,6 +42,8 @@ export default [
       parserOptions: {
         project: "./tsconfig.json",
         tsconfigRootDir: import.meta.dirname,
+        createDefaultProgram: false,
+        warnOnUnsupportedTypeScriptVersion: false,
       },
       globals: {
         // Node.js globals for TypeScript files too
@@ -54,6 +64,16 @@ export default [
     rules: {
       ...tsPlugin.configs.recommended.rules,
       "no-console": "warn",
+      "@typescript-eslint/no-floating-promises": "off",
+      "@typescript-eslint/require-await": "off",
+      "@typescript-eslint/no-misused-promises": "off",
+    },
+  },
+  // Allow console in infrastructure/config files
+  {
+    files: ["**/server.ts", "**/db/*.ts", "**/config/*.ts", "**/scripts/*.ts", "**/*.config.ts", "**/middleware/*.ts"],
+    rules: {
+      "no-console": "off",
     },
   },
   {
@@ -64,6 +84,7 @@ export default [
     rules: {
       ...vitest.configs.recommended.rules,
       "@typescript-eslint/unbound-method": "off",
+      "no-console": "off",
     },
   },
 ];

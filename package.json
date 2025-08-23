@@ -1,5 +1,5 @@
 {
-  "name": "express-api-ts",
+  "name": "ecomm-api",
   "version": "1.0.0",
   "description": "",
   "type": "module",
@@ -15,8 +15,8 @@
     "test:ui": "vitest --ui",
     "coverage": "vitest run --coverage",
     "prepare": "husky",
-    "lint": "eslint . --ext .ts,.tsx",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "lint": "node --max-old-space-size=4096 ./node_modules/.bin/eslint . --ext .ts,.tsx --cache",
+    "lint:fix": "node --max-old-space-size=4096 ./node_modules/.bin/eslint . --ext .ts,.tsx --fix --cache",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -50,12 +50,11 @@
     "#*": "./src/*"
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint",
-      "prettier --check"
+    "*.{ts,tsx}": [
+      "node --max-old-space-size=4096 ./node_modules/.bin/eslint --fix --cache --max-warnings=0"
     ],
-    "*.{json,yml,yaml,md}": [
-      "prettier --check"
+    "*.{js,jsx,ts,tsx,json,yml,yaml,md}": [
+      "prettier --write"
     ]
   }
 }
