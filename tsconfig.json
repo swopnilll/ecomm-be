@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    // Output folders
+    "outDir": "./dist",
+    "rootDir": "./src",
+
+    // Node.js + ESM
+    "module": "nodenext",
+    "target": "esnext",
+    "lib": ["esnext"],
+    "types": ["node"],
+
+    // Emit extras
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // Type safety
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+
+    // Modern module resolution
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    "skipLibCheck": true
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
+}
