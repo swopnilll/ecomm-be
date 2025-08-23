@@ -31,6 +31,35 @@ export class ValidationError extends Error {
   }
 }
 
+export class ProductNotFoundError extends Error {
+  constructor(message: string = "Product not found") {
+    super(message);
+    this.name = "ProductNotFoundError";
+  }
+}
+
+export class ProductAlreadyExistsError extends Error {
+  constructor(message: string = "Product with this name already exists") {
+    super(message);
+    this.name = "ProductAlreadyExistsError";
+  }
+}
+
+export class InsufficientStockError extends Error {
+  constructor(message: string = "Insufficient stock available") {
+    super(message);
+    this.name = "InsufficientStockError";
+  }
+}
+
+export class InvalidProductStatusError extends Error {
+  constructor(message: string = "Invalid product status") {
+    super(message);
+    this.name = "InvalidProductStatusError";
+  }
+}
+
+// Update the handleServiceError function to include these new errors:
 export const handleServiceError = (error: Error, res: Response) => {
   if (error instanceof UserNotFoundError) {
     return res.status(404).json({
@@ -39,8 +68,36 @@ export const handleServiceError = (error: Error, res: Response) => {
     });
   }
 
+  if (error instanceof ProductNotFoundError) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
   if (error instanceof EmailAlreadyExistsError) {
     return res.status(409).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof ProductAlreadyExistsError) {
+    return res.status(409).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof InsufficientStockError) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof InvalidProductStatusError) {
+    return res.status(400).json({
       success: false,
       message: error.message,
     });

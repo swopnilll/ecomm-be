@@ -41,7 +41,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 1000 * 60, // 1 minute
+      maxAge: 1000 * 60 * 60, // 1 hour
     });
 
     // Setting refreshToken in HTTP-only cookie
@@ -102,7 +102,7 @@ export const refreshAccessToken = (req: Request, res: Response): void => {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
-      maxAge: 1000 * 60, // 1 minute
+      maxAge: 1000 * 60 * 60, // 1 hour
     });
 
     logger.info("Access token refreshed successfully");
