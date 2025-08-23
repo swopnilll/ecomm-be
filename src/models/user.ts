@@ -1,5 +1,5 @@
-import mongoose, { Document } from "mongoose";
 import { z } from "zod";
+import mongoose, { Document } from "mongoose";
 
 // Zod schema for validation
 export const UserZodSchema = z.object({
