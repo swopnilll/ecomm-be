@@ -27,3 +27,27 @@ export const registerUser = async (req: Request, res: Response) => {
     res.status(400).json({ error: (error as Error).message });
   }
 };
+
+export const loginUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    logger.info(`Login attempt for email: ${req.body.email}`);
+
+    const { user, token } = await authService.loginUser(req.body);
+
+    logger.info(`User logged in successfully: ${user.email}`);
+
+    // Setting JWT token in HTTP-only cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production", // only sending cookie over HTTPS in prod
+      sameSite: "strict",
+      maxAge: 1000 * 60 * 60, // 1 hour
+    });
+
+    // sanitized user data for response
+    res.status(200).json({ data: sanitizeUser(user) });
+  } catch (error) {
+    logger.error(`Login failed for email: ${req.body.email}. Error: ${(error as Error).message}`);
+    res.status(401).json({ error: (error as Error).message });
+  }
+};
