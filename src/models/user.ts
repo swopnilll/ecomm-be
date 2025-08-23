@@ -62,6 +62,8 @@ export interface IUser extends Document {
   lastName: string;
   isBlocked: boolean;
   orderCount: number;
+  isDeleted: boolean;
+  deletedAt?: Date;
   resetPasswordToken?: string;
   resetPasswordExpires?: Date;
   createdAt: Date;
@@ -121,6 +123,8 @@ const userSchema = new mongoose.Schema<IUser>(
       type: Date,
       required: false,
     },
+    isDeleted: { type: Boolean, default: false, index: true },
+    deletedAt: { type: Date, required: false },
   },
   {
     timestamps: true, // Automatically adds createdAt and updatedAt

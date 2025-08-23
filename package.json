@@ -7,6 +7,8 @@
     "dev": "tsx --watch --env-file .env.development src/server.ts",
     "dev:staging": "tsx --watch --env-file .env.staging src/server.ts",
     "dev:prod": "tsx --watch --env-file .env.production src/server.ts",
+    "seed": "tsx --env-file .env src/seeds/index.ts",
+    "seed:dev": "tsx --env-file .env.development src/seeds/index.ts",
     "start": "node --env-file .env dist/server.js",
     "build": "tsc -p tsconfig.build.json",
     "type-check": "tsc --noEmit",
