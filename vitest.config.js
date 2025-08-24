@@ -1,3 +1,9 @@
 import { defineConfig } from "vitest/config";
 
-export default defineConfig({});
+export default defineConfig({
+  test: {
+    setupFiles: ["./src/__tests__/setup.ts"],
+    globals: true,
+    environment: "node",
+  },
+});
