@@ -19,12 +19,22 @@ const morganStream = {
   },
 };
 
-const allowedOrigins = ["http://localhost:5174"];
-
+// TODO: Replace with strict CORS Rule before deployment
 app.use(
   cors({
-    origin: allowedOrigins,
-    credentials: true, // allow cookies/auth headers
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+
+      // Allow all localhost origins, regardless of port
+      if (/^http:\/\/localhost:\d+$/.test(origin)) {
+        return callback(null, true);
+      }
+
+      // Otherwise, block
+      return callback(new Error("Not allowed by CORS"), false);
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
   }),

@@ -353,12 +353,21 @@ export const unpublishProduct = async (id: string): Promise<IProduct | null> => 
  */
 export const searchProductsByName = async (searchTerm: string): Promise<IProduct[]> => {
   try {
+    // const products = await Product.find({
+    //   $text: { $search: searchTerm },
+    //   isDeleted: false,
+    // })
+    //   .populate("createdBy", "firstName lastName email")
+    //   .sort({ score: { $meta: "textScore" } });
+
+    const searchRegex = new RegExp(searchTerm, "i");
+
     const products = await Product.find({
-      $text: { $search: searchTerm },
+      name: { $regex: searchRegex },
       isDeleted: false,
     })
       .populate("createdBy", "firstName lastName email")
-      .sort({ score: { $meta: "textScore" } });
+      .sort({ createdAt: -1 });
 
     return products;
   } catch (error) {
