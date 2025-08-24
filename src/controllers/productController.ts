@@ -107,6 +107,30 @@ export const getAllProducts = async (req: Request, res: Response): Promise<void>
   }
 };
 
+export const getAllProductsIncludingDrafts = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { page = 1, limit = 10, sortBy = "createdAt", sortOrder = "desc", ...searchParams } = req.query;
+
+    const result = await getAllProductsService(searchParams, Number(page), Number(limit), sortBy as string, sortOrder as "asc" | "desc");
+
+    res.status(200).json({
+      success: true,
+      message: "Products retrieved successfully",
+      data: {
+        products: result.products,
+        pagination: {
+          page: result.page,
+          limit: Number(limit),
+          total: result.total,
+          totalPages: result.totalPages,
+        },
+      },
+    });
+  } catch (error) {
+    handleServiceError(error as Error, res);
+  }
+};
+
 /**
  * Update product by ID
  */

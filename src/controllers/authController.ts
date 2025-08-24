@@ -3,6 +3,7 @@ import { type Request, type Response } from "express";
 import logger from "../utils/logger.js";
 import type { IUser } from "#models/user.js";
 import * as authService from "../services/authService.js";
+import type { AuthenticatedRequest } from "#middleware/authMiddleware.js";
 
 // Utility to sanitize user object for client responses
 const sanitizeUser = (user: IUser) => {
@@ -117,13 +118,15 @@ export const refreshAccessToken = (req: Request, res: Response): void => {
 };
 
 export const getCurrentUser = async (req: Request, res: Response) => {
+  const authReq = req as AuthenticatedRequest;
+
   try {
-    if (!req.user) {
+    if (!authReq.user) {
       res.status(401).json({ error: "User not authenticated" });
       return;
     }
 
-    const user = await authService.getUserById(req.user._id);
+    const user = await authService.getUserById(authReq.user._id);
     res.status(200).json({ data: sanitizeUser(user) });
   } catch (error) {
     logger.error(`Failed to retrieve user: ${(error as Error).message}`);
@@ -132,19 +135,21 @@ export const getCurrentUser = async (req: Request, res: Response) => {
 };
 
 export const changePassword = async (req: Request, res: Response): Promise<void> => {
+  const authReq = req as AuthenticatedRequest;
+
   try {
-    if (!req.user || !req.user._id) {
+    if (!authReq.user || !authReq.user._id) {
       res.status(401).json({ error: "Authentication required to change password." });
       return;
     }
 
     const { currentPassword, newPassword } = req.body;
-    await authService.changePassword(req.user._id, currentPassword, newPassword);
+    await authService.changePassword(authReq.user._id, currentPassword, newPassword);
 
-    logger.info(`Password successfully changed for user ID: ${req.user._id}`);
+    logger.info(`Password successfully changed for user ID: ${authReq.user._id}`);
     res.status(200).json({ message: "Password has been successfully changed." });
   } catch (error) {
-    logger.error(`Password change failed for user ID: ${req.user?._id}. Error: ${(error as Error).message}`);
+    logger.error(`Password change failed for user ID: ${authReq.user?._id}. Error: ${(error as Error).message}`);
     res.status(400).json({ error: (error as Error).message });
   }
 };

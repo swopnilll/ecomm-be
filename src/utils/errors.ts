@@ -59,7 +59,41 @@ export class InvalidProductStatusError extends Error {
   }
 }
 
-// Update the handleServiceError function to include these new errors:
+export class OrderNotFoundError extends Error {
+  constructor(message: string = "Order not found") {
+    super(message);
+    this.name = "OrderNotFoundError";
+  }
+}
+
+export class OrderAlreadyExistsError extends Error {
+  constructor(message: string = "Order already exists") {
+    super(message);
+    this.name = "OrderAlreadyExistsError";
+  }
+}
+
+export class InvalidOrderStatusError extends Error {
+  constructor(message: string = "Invalid order status transition") {
+    super(message);
+    this.name = "InvalidOrderStatusError";
+  }
+}
+
+export class OrderCannotBeModifiedError extends Error {
+  constructor(message: string = "Order cannot be modified") {
+    super(message);
+    this.name = "OrderCannotBeModifiedError";
+  }
+}
+
+export class OrderCannotBeCancelledError extends Error {
+  constructor(message: string = "Order cannot be cancelled") {
+    super(message);
+    this.name = "OrderCannotBeCancelledError";
+  }
+}
+
 export const handleServiceError = (error: Error, res: Response) => {
   if (error instanceof UserNotFoundError) {
     return res.status(404).json({
@@ -69,6 +103,13 @@ export const handleServiceError = (error: Error, res: Response) => {
   }
 
   if (error instanceof ProductNotFoundError) {
+    return res.status(404).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof OrderNotFoundError) {
     return res.status(404).json({
       success: false,
       message: error.message,
@@ -89,6 +130,13 @@ export const handleServiceError = (error: Error, res: Response) => {
     });
   }
 
+  if (error instanceof OrderAlreadyExistsError) {
+    return res.status(409).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
   if (error instanceof InsufficientStockError) {
     return res.status(400).json({
       success: false,
@@ -97,6 +145,27 @@ export const handleServiceError = (error: Error, res: Response) => {
   }
 
   if (error instanceof InvalidProductStatusError) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof InvalidOrderStatusError) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof OrderCannotBeModifiedError) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+
+  if (error instanceof OrderCannotBeCancelledError) {
     return res.status(400).json({
       success: false,
       message: error.message,
